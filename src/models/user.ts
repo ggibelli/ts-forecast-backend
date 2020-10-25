@@ -5,12 +5,9 @@ import mongoose from 'mongoose';
 import {
   prop,
   getModelForClass,
-  Ref,
   index,
   modelOptions,
 } from '@typegoose/typegoose';
-import { Continent } from './continent';
-import { Country } from './country';
 import { SurfSpot } from './surfspot';
 
 mongoose.set('useCreateIndex', true);
@@ -18,33 +15,37 @@ mongoose.set('useCreateIndex', true);
 @modelOptions({
   schemaOptions: {
     toJSON: {
-      transform: (_document, returnedObject) => {
+      transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString();
         delete returnedObject._id;
         delete returnedObject.__v;
+        delete returnedObject.passwordHash;
       },
     },
   },
 })
-@index({ name: 1, latitude: 1, longitude: 1 }, { unique: true })
-export class Region {
+@index({ username: 1, email: 1 }, { unique: true })
+export class User {
   @prop({ required: true, unique: true, minlength: 3 })
-  public name!: string;
+  public username!: string;
 
-  @prop({ ref: () => Continent, required: true })
-  public continent!: Ref<Continent>;
+  @prop({ required: true, unique: true, minlength: 3 })
+  public email!: string;
 
-  @prop({ ref: () => Country, required: true })
-  public country!: Ref<Country>;
+  @prop({ required: true })
+  public passwordHash!: string;
+
+  @prop()
+  public firstName?: string;
+
+  @prop()
+  public lastName?: string;
 
   @prop({ type: () => [SurfSpot] })
-  public surfSpots?: SurfSpot[];
+  public createdSpots?: SurfSpot[];
 
-  @prop({ required: true })
-  public latitude!: string;
-
-  @prop({ required: true })
-  public longitude!: string;
+  @prop({ type: () => [SurfSpot] })
+  public starredSpots?: SurfSpot[];
 }
 
-export const RegionModel = getModelForClass(Region);
+export const UserModel = getModelForClass(User);

@@ -2,52 +2,40 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import mongoose from 'mongoose';
-import mongooseUniqueValidator from 'mongoose-unique-validator';
-import { ICountry } from './country';
+import { Country } from './country';
+import {
+  prop,
+  getModelForClass,
+  index,
+  modelOptions,
+} from '@typegoose/typegoose';
 
 mongoose.set('useCreateIndex', true);
 
-export interface IContinent {
-  name: string;
-  countries: mongoose.Types.ObjectId[] | ICountry[];
-  latitude: string;
-  longitude: string;
+@modelOptions({
+  schemaOptions: {
+    toJSON: {
+      transform: (_document, returnedObject) => {
+        returnedObject.id = returnedObject._id.toString();
+        delete returnedObject._id;
+        delete returnedObject.__v;
+      },
+    },
+  },
+})
+@index({ name: 1, latitude: 1, longitude: 1 }, { unique: true })
+export class Continent {
+  @prop({ required: true, unique: true, minlength: 3 })
+  public name!: string;
+
+  @prop({ type: () => [Country] })
+  public countries?: Country[];
+
+  @prop({ required: true })
+  public latitude!: string;
+
+  @prop({ required: true })
+  public longitude!: string;
 }
 
-interface IContinentDoc extends IContinent, mongoose.Document {}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ContinentFields: Record<keyof IContinent, any> = {
-  name: {
-    type: String,
-    unique: true,
-    minlength: 3,
-    required: true,
-  },
-  countries: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Country',
-    },
-  ],
-  latitude: { type: String, required: true },
-  longitude: { type: String, required: true },
-};
-
-const continentSchema = new mongoose.Schema(ContinentFields);
-
-continentSchema.index({ latitude: 1, longitude: 1 }, { unique: true });
-
-continentSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
-
-continentSchema.plugin(mongooseUniqueValidator);
-export const Continent = mongoose.model<IContinentDoc>(
-  'Continent',
-  continentSchema
-);
+export const ContinentModel = getModelForClass(Continent);

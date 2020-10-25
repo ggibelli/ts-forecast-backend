@@ -7,7 +7,7 @@ import { loggerInfo, loggerError } from './utils/logger';
 import typeDefs from './schemas';
 import resolvers from './resolvers';
 import jwt from 'jsonwebtoken';
-import { User } from './models/users';
+import { UserModel as User } from './models/user';
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
