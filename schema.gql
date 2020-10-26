@@ -98,6 +98,7 @@ type SurfSpot {
   bottom: String
   continent: Continent!
   country: Country!
+  createdBy: User
   dangers: String
   direction: String
   forecast: Forecast

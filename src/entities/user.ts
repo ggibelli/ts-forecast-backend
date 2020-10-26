@@ -9,6 +9,7 @@ import {
   getModelForClass,
   index,
   modelOptions,
+  Ref,
 } from '@typegoose/typegoose';
 import { SurfSpot } from './surfspot';
 
@@ -33,12 +34,12 @@ export class User {
   readonly _id!: ObjectId;
 
   @Field((_type) => [SurfSpot], { nullable: true })
-  @prop({ type: () => [SurfSpot] })
-  public createdSpots?: SurfSpot[];
+  @prop({ ref: () => 'SurfSpot' })
+  public createdSpots?: Ref<SurfSpot>[];
 
   @Field((_type) => [SurfSpot], { nullable: true })
-  @prop({ type: () => [SurfSpot] })
-  public starredSpots?: SurfSpot[];
+  @prop({ ref: () => 'SurfSpot' })
+  public starredSpots?: Ref<SurfSpot>[];
 
   @Field()
   @prop({ required: true, unique: true, minlength: 3 })

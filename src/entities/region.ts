@@ -47,8 +47,8 @@ export class Region {
   public country!: Ref<Country>;
 
   @Field((_type) => [SurfSpot], { nullable: true })
-  @prop({ type: () => [SurfSpot] })
-  public surfSpots?: SurfSpot[];
+  @prop({ ref: () => 'SurfSpot' })
+  public surfSpots?: Ref<SurfSpot>[];
 
   @Field()
   @prop({ required: true })
