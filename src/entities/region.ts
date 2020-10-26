@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import mongoose from 'mongoose';
+import { ObjectId } from 'mongodb';
+import { ObjectType, Field } from 'type-graphql';
 import {
   prop,
   getModelForClass,
@@ -27,22 +29,32 @@ mongoose.set('useCreateIndex', true);
   },
 })
 @index({ name: 1, latitude: 1, longitude: 1 }, { unique: true })
+@ObjectType()
 export class Region {
+  @Field()
+  readonly _id!: ObjectId;
+
+  @Field()
   @prop({ required: true, unique: true, minlength: 3 })
   public name!: string;
 
-  @prop({ ref: () => Continent, required: true })
+  @Field((_type) => Continent)
+  @prop({ ref: () => 'Continent', required: true })
   public continent!: Ref<Continent>;
 
-  @prop({ ref: () => Country, required: true })
+  @Field((_type) => Country)
+  @prop({ ref: () => 'Country', required: true })
   public country!: Ref<Country>;
 
+  @Field((_type) => [SurfSpot], { nullable: true })
   @prop({ type: () => [SurfSpot] })
   public surfSpots?: SurfSpot[];
 
+  @Field()
   @prop({ required: true })
   public latitude!: string;
 
+  @Field()
   @prop({ required: true })
   public longitude!: string;
 }

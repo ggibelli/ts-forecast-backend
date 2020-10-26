@@ -2,15 +2,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import mongoose from 'mongoose';
+import { Country } from './country';
+import { ObjectId } from 'mongodb';
+import { ObjectType, Field } from 'type-graphql';
 import {
   prop,
   getModelForClass,
-  Ref,
   index,
   modelOptions,
 } from '@typegoose/typegoose';
-import { Continent } from './continent';
-import { Region } from './region';
 
 mongoose.set('useCreateIndex', true);
 
@@ -26,21 +26,26 @@ mongoose.set('useCreateIndex', true);
   },
 })
 @index({ name: 1, latitude: 1, longitude: 1 }, { unique: true })
-export class Country {
+@ObjectType({ description: 'The continent model' })
+export class Continent {
+  @Field()
+  readonly _id!: ObjectId;
+
+  @Field()
   @prop({ required: true, unique: true, minlength: 3 })
   public name!: string;
 
-  @prop({ ref: () => Continent, required: true })
-  public continent!: Ref<Continent>;
+  @Field((_type) => [Country], { nullable: true })
+  @prop({ type: () => Country, default: [] })
+  public countries?: Country[];
 
-  @prop({ type: () => [Region] })
-  public regions?: Region[];
-
+  @Field()
   @prop({ required: true })
   public latitude!: string;
 
+  @Field()
   @prop({ required: true })
   public longitude!: string;
 }
 
-export const CountryModel = getModelForClass(Country);
+export const ContinentModel = getModelForClass(Continent);

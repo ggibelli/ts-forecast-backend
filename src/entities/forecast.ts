@@ -2,18 +2,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import mongoose from 'mongoose';
+import { ObjectId } from 'mongodb';
+import { ObjectType, Field } from 'type-graphql';
 import {
   prop,
   getModelForClass,
   Ref,
   index,
   modelOptions,
+  Severity,
 } from '@typegoose/typegoose';
 import { SurfSpot } from './surfspot';
+import { IForecast, ITide } from '../types';
 
 mongoose.set('useCreateIndex', true);
 
 @modelOptions({
+  options: { allowMixed: Severity.ALLOW },
   schemaOptions: {
     toJSON: {
       transform: (document, returnedObject) => {
@@ -27,21 +32,30 @@ mongoose.set('useCreateIndex', true);
   },
 })
 @index({ surfspot: 1 }, { unique: true })
+@ObjectType()
 export class Forecast {
-  @prop({ ref: () => SurfSpot, required: true })
+  @Field()
+  readonly _id!: ObjectId;
+
+  @Field((_type) => SurfSpot)
+  @prop({ ref: () => 'SurfSpot', required: true })
   public surfspot!: Ref<SurfSpot>;
 
-  @prop({ type: () => [mongoose.Schema.Types.Mixed] })
-  public forecast?: mongoose.Schema.Types.Mixed[];
+  @Field((_type) => [IForecast])
+  @prop({ type: () => [IForecast] })
+  public forecast?: IForecast[];
 
-  @prop({ type: () => [mongoose.Schema.Types.Mixed] })
-  public tides?: mongoose.Schema.Types.Mixed[];
+  @Field((_type) => [ITide])
+  @prop({ type: () => ITide })
+  public tides?: ITide[];
 
+  @Field()
   @prop({ required: true })
-  public forecastLastRequest!: number;
+  public forecastLastRequest!: Date;
 
+  @Field()
   @prop({ required: true })
-  public tidesLastRequest!: number;
+  public tidesLastRequest!: Date;
 }
 
 export const ForecastModel = getModelForClass(Forecast);
