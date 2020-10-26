@@ -61,8 +61,8 @@ export class SurfSpot {
   public latitude!: string;
 
   @Field((_type) => User, { nullable: true })
-  @prop({ type: 'User' })
-  public createdBy?: User;
+  @prop({ ref: 'User' })
+  public createdBy?: Ref<User>;
 
   @Field()
   @prop({ required: true })
