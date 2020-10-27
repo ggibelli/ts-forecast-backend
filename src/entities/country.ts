@@ -10,12 +10,14 @@ import {
   Ref,
   index,
   modelOptions,
+  plugin,
 } from '@typegoose/typegoose';
+import * as autopopulate from 'mongoose-autopopulate';
+
 import { Continent } from './continent';
 import { Region } from './region';
 
 mongoose.set('useCreateIndex', true);
-
 @modelOptions({
   schemaOptions: {
     toJSON: {
@@ -29,6 +31,7 @@ mongoose.set('useCreateIndex', true);
 })
 @index({ name: 1, latitude: 1, longitude: 1 }, { unique: true })
 @ObjectType()
+@plugin(autopopulate.default as any)
 export class Country {
   @Field()
   readonly _id!: ObjectId;
@@ -38,12 +41,12 @@ export class Country {
   public name!: string;
 
   @Field((_type) => Continent)
-  @prop({ ref: () => 'Continent', required: true })
+  @prop({ autopopulate: true, ref: 'Continent', required: true })
   public continent!: Ref<Continent>;
 
-  @Field((_type) => Region, { nullable: true })
-  @prop({ type: () => [Region] })
-  public regions?: Region[];
+  @Field((_type) => [Region], { nullable: true })
+  @prop({ autopopulate: true, ref: 'Region' })
+  public regions?: Ref<Region>[];
 
   @Field()
   @prop({ required: true })

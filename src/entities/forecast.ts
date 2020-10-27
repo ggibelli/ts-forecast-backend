@@ -11,7 +11,9 @@ import {
   index,
   modelOptions,
   Severity,
+  plugin,
 } from '@typegoose/typegoose';
+import * as autopopulate from 'mongoose-autopopulate';
 import { SurfSpot } from './surfspot';
 import { IForecast, ITide } from '../types';
 
@@ -33,12 +35,13 @@ mongoose.set('useCreateIndex', true);
 })
 @index({ surfspot: 1 }, { unique: true })
 @ObjectType()
+@plugin(autopopulate.default as any)
 export class Forecast {
   @Field()
   readonly _id!: ObjectId;
 
   @Field((_type) => SurfSpot)
-  @prop({ ref: () => 'SurfSpot', required: true })
+  @prop({ autopopulate: true, ref: 'SurfSpot', required: true })
   public surfspot!: Ref<SurfSpot>;
 
   @Field((_type) => [IForecast])

@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { Resolver, Query, Arg } from 'type-graphql';
+import { Resolver, Query, Arg, Root, Ctx } from 'type-graphql';
 import { User, UserModel } from '../entities/user';
 import { ObjectIdScalar } from '../utils/object-id.scalar';
 

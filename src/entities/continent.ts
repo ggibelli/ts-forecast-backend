@@ -10,10 +10,14 @@ import {
   getModelForClass,
   index,
   modelOptions,
+  plugin,
+  Ref,
 } from '@typegoose/typegoose';
+import * as autopopulate from 'mongoose-autopopulate';
 
 mongoose.set('useCreateIndex', true);
 
+@plugin(autopopulate.default as any)
 @modelOptions({
   schemaOptions: {
     toJSON: {
@@ -36,8 +40,8 @@ export class Continent {
   public name!: string;
 
   @Field((_type) => [Country], { nullable: true })
-  @prop({ type: () => Country, default: [] })
-  public countries?: Country[];
+  @prop({ autopopulate: true, ref: 'Country' })
+  public countries?: Ref<Country>[];
 
   @Field()
   @prop({ required: true })

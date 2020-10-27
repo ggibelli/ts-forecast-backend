@@ -10,7 +10,9 @@ import {
   index,
   modelOptions,
   Ref,
+  plugin,
 } from '@typegoose/typegoose';
+import * as autopopulate from 'mongoose-autopopulate';
 import { SurfSpot } from './surfspot';
 
 mongoose.set('useCreateIndex', true);
@@ -29,16 +31,17 @@ mongoose.set('useCreateIndex', true);
 })
 @index({ username: 1, email: 1 }, { unique: true })
 @ObjectType()
+@plugin(autopopulate.default as any)
 export class User {
   @Field()
   readonly _id!: ObjectId;
 
   @Field((_type) => [SurfSpot], { nullable: true })
-  @prop({ ref: () => 'SurfSpot' })
+  @prop({ autopopulate: true, ref: 'SurfSpot' })
   public createdSpots?: Ref<SurfSpot>[];
 
   @Field((_type) => [SurfSpot], { nullable: true })
-  @prop({ ref: () => 'SurfSpot' })
+  @prop({ autopopulate: true, ref: 'SurfSpot' })
   public starredSpots?: Ref<SurfSpot>[];
 
   @Field()

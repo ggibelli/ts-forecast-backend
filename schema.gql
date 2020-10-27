@@ -18,7 +18,7 @@ type Country {
   latitude: String!
   longitude: String!
   name: String!
-  regions: Region
+  regions: [Region!]
 }
 
 type Forecast {
@@ -75,6 +75,7 @@ type Query {
   forecasts: [Forecast!]!
   region(regionId: ObjectId!): Region!
   regions: [Region!]!
+  spotsNumber: Float!
   surfspot(surfspotId: ObjectId!): SurfSpot!
   surfspots: [SurfSpot!]!
   user(userId: ObjectId!): User!

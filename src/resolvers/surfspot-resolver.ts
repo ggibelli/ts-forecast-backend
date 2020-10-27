@@ -13,6 +13,12 @@ export class SurfspotResolver {
     return await SurfSpotModel.findById(surfspotId);
   }
 
+  @Query((_returns) => Number)
+  async spotsNumber(): Promise<number> {
+    const surfspotNumber = await SurfSpotModel.countDocuments();
+    return surfspotNumber;
+  }
+
   @Query((_returns) => [SurfSpot])
   async surfspots(): Promise<SurfSpot[]> {
     return await SurfSpotModel.find({});

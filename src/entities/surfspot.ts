@@ -10,7 +10,9 @@ import {
   Ref,
   index,
   modelOptions,
+  plugin,
 } from '@typegoose/typegoose';
+import * as autopopulate from 'mongoose-autopopulate';
 import { Continent } from './continent';
 import { Country } from './country';
 import { Region } from './region';
@@ -32,6 +34,7 @@ mongoose.set('useCreateIndex', true);
 })
 @index({ name: 1, latitude: 1, longitude: 1 }, { unique: true })
 @ObjectType()
+@plugin(autopopulate.default as any)
 export class SurfSpot {
   @Field()
   readonly _id!: ObjectId;
@@ -41,19 +44,19 @@ export class SurfSpot {
   public name!: string;
 
   @Field((_type) => Continent)
-  @prop({ ref: () => 'Continent', required: true })
+  @prop({ autopopulate: true, ref: () => 'Continent', required: true })
   public continent!: Ref<Continent>;
 
   @Field((_type) => Country)
-  @prop({ ref: () => 'Country', required: true })
+  @prop({ autopopulate: true, ref: () => 'Country', required: true })
   public country!: Ref<Country>;
 
   @Field((_type) => Region)
-  @prop({ ref: () => 'Region', required: true })
+  @prop({ autopopulate: true, ref: () => 'Region', required: true })
   public region!: Ref<Region>;
 
   @Field((_type) => Forecast, { nullable: true })
-  @prop({ ref: () => 'Forecast' })
+  @prop({ autopopulate: true, ref: () => 'Forecast' })
   public forecast?: Ref<Forecast>;
 
   @Field()
@@ -61,7 +64,7 @@ export class SurfSpot {
   public latitude!: string;
 
   @Field((_type) => User, { nullable: true })
-  @prop({ ref: () => 'User' })
+  @prop({ autopopulate: true, ref: () => 'User' })
   public createdBy?: Ref<User>;
 
   @Field()
