@@ -1,78 +1,57 @@
-import 'reflect-metadata';
-import { ObjectId } from 'mongodb';
-import { buildSchema } from 'type-graphql';
-import { ObjectIdScalar } from './utils/object-id.scalar';
-import { ContinentResolver } from './resolvers/continent-resolver';
-import { CountryResolver } from './resolvers/country-resolver';
-import { RegionResolver } from './resolvers/region-resolver';
-import { SurfspotResolver } from './resolvers/surfspot-resolver';
-import { ForecastResolver } from './resolvers/forecast-resolver';
-import { UserResolver } from './resolvers/user-resolver';
-
 import express from 'express';
-
-import { ApolloServer } from 'apollo-server-express';
-import { connect, set } from 'mongoose';
+import { ApolloServer, gql } from 'apollo-server-express';
+import mongoose from 'mongoose';
 import http from 'http';
 import { MONGODB_URI, SECRET, PORT } from './utils/config';
 import { loggerInfo, loggerError } from './utils/logger';
+import { typeDefs, resolvers } from './schema/continent-resolver';
+//import resolvers from './schema';
 import jwt from 'jsonwebtoken';
-import { UserModel as User } from './entities/user';
+import { User } from './models/user';
+import { DecodedToken } from './types';
 
-set('useFindAndModify', false);
-set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
 
-const main = async () => {
-  const schema = await buildSchema({
-    resolvers: [
-      ContinentResolver,
-      CountryResolver,
-      RegionResolver,
-      SurfspotResolver,
-      ForecastResolver,
-      UserResolver,
-    ],
-    scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
-    dateScalarMode: 'timestamp',
-    emitSchemaFile: true,
-    validate: false,
-  });
-  console.log(MONGODB_URI);
-  const mongoose = await connect(MONGODB_URI, {
+mongoose
+  .connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+  })
+  .then(() => {
+    loggerInfo('connected to MongoDB');
+  })
+  .catch((error) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    loggerError('error connection to MongoDB: ', error.message);
   });
-  mongoose.connection;
 
-  type Req = { req: http.IncomingMessage };
+type Req = { req: http.IncomingMessage };
 
-  interface Token {
-    id: string;
-  }
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: async ({ req }: Req) => {
+    const auth = req ? req.headers.authorization : null;
+    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+      const decodedToken = jwt.verify(
+        auth.substring(7),
+        SECRET
+      ) as DecodedToken;
 
-  const server = new ApolloServer({
-    schema,
-    context: async ({ req }: Req) => {
-      const auth = req ? req.headers.authorization : null;
-      if (auth && auth.toLowerCase().startsWith('bearer ')) {
-        const decodedToken = jwt.verify(auth.substring(7), SECRET) as Token;
+      const currentUser = await User.findById(decodedToken.id);
 
-        const currentUser = await User.findById(decodedToken.id);
-
-        return { currentUser };
-      }
-      return null;
-    },
-  });
-  const app = express();
-  server.applyMiddleware({ app });
-
-  app.listen(PORT, () =>
-    loggerInfo(
-      `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
-    )
-  );
-};
-main().catch((error) => {
-  loggerError(error);
+      return { currentUser };
+    }
+    return null;
+  },
 });
+
+const app = express();
+server.applyMiddleware({ app });
+
+app.listen(PORT, () =>
+  console.log(
+    `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
+  )
+);
