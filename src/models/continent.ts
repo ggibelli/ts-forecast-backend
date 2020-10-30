@@ -1,23 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import mongooseUniqueValidator from 'mongoose-unique-validator';
 import { ICountry } from './country';
 
 mongoose.set('useCreateIndex', true);
 
-export interface IContinent {
+export interface IContinent extends Document {
   name: string;
-  countries: mongoose.Types.ObjectId[] | ICountry[];
+  countries?: Array<ICountry['_id']>;
   latitude: string;
   longitude: string;
 }
-
-export interface IContinentDoc extends IContinent, mongoose.Document {}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ContinentFields: Record<keyof IContinent, any> = {
+const continentSchema = new Schema({
   name: {
     type: String,
     unique: true,
@@ -26,15 +22,13 @@ const ContinentFields: Record<keyof IContinent, any> = {
   },
   countries: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Country',
     },
   ],
   latitude: { type: String, required: true },
   longitude: { type: String, required: true },
-};
-
-const continentSchema = new mongoose.Schema(ContinentFields);
+});
 
 continentSchema.index({ latitude: 1, longitude: 1 }, { unique: true });
 
@@ -47,7 +41,7 @@ continentSchema.set('toJSON', {
 });
 
 continentSchema.plugin(mongooseUniqueValidator);
-export const ContinentModel = mongoose.model<IContinentDoc>(
+export const ContinentModel = mongoose.model<IContinent>(
   'Continent',
   continentSchema
 );

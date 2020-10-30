@@ -1,37 +1,33 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import mongooseUniqueValidator from 'mongoose-unique-validator';
 import { ISurfSpot } from './surfspot';
+import { ForecastType, TideType } from '../types';
 
 mongoose.set('useCreateIndex', true);
 
-export interface IForecast {
-  surfspot: mongoose.Types.ObjectId | ISurfSpot;
-  forecast: mongoose.Schema.Types.Mixed[];
-  forecastLastRequest: number;
-  tides: mongoose.Schema.Types.Mixed[];
-  tidesLastRequest: number;
+export interface IForecast extends Document {
+  surfspot: ISurfSpot['_id'];
+  forecast?: ForecastType;
+  forecastLastRequest?: number;
+  tides?: TideType;
+  tidesLastRequest?: number;
 }
 
-interface IForecastDoc extends IForecast, mongoose.Document {}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ForecastSchemaFields: Record<keyof IForecast, any> = {
+const forecastSchema = new Schema({
   surfspot: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'SurfSpot',
     required: true,
     unique: true,
   },
-  forecast: [mongoose.Schema.Types.Mixed],
+  forecast: Schema.Types.Mixed,
   forecastLastRequest: Number,
-  tides: [mongoose.Schema.Types.Mixed],
+  tides: Schema.Types.Mixed,
   tidesLastRequest: Number,
-};
-
-const forecastSchema = new mongoose.Schema(ForecastSchemaFields);
+});
 
 forecastSchema.set('toJSON', {
   transform: (document, returnedObject) => {
@@ -44,7 +40,4 @@ forecastSchema.set('toJSON', {
 });
 
 forecastSchema.plugin(mongooseUniqueValidator);
-export const Forecast = mongoose.model<IForecastDoc>(
-  'Forecast',
-  forecastSchema
-);
+export const Forecast = mongoose.model<IForecast>('Forecast', forecastSchema);

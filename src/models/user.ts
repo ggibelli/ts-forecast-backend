@@ -1,25 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import mongooseUniqueValidator from 'mongoose-unique-validator';
+import { Surfspot } from '../generated/graphql';
 
 mongoose.set('useCreateIndex', true);
 
-export interface IUser {
+export interface IUser extends Document {
   username: string;
   email: string;
   firstName: string;
   lastName: string;
   passwordHash: string;
-  starredSpots: mongoose.Types.ObjectId[];
-  createdSpots: mongoose.Types.ObjectId[];
+  starredSpots?: Array<Surfspot['_id']>;
+  createdSpots?: Array<Surfspot['_id']>;
 }
 
-interface IUserDoc extends IUser, mongoose.Document {}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const UserSchemaFields: Record<keyof IUser, any> = {
+const userSchema = new Schema({
   username: {
     type: String,
     unique: true,
@@ -37,19 +35,17 @@ const UserSchemaFields: Record<keyof IUser, any> = {
   passwordHash: String,
   starredSpots: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'SurfSpot',
     },
   ],
   createdSpots: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'SurfSpot',
     },
   ],
-};
-
-const userSchema = new mongoose.Schema(UserSchemaFields);
+});
 
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
@@ -62,4 +58,4 @@ userSchema.set('toJSON', {
 
 userSchema.plugin(mongooseUniqueValidator);
 
-export const User = mongoose.model<IUserDoc>('User', userSchema);
+export const User = mongoose.model<IUser>('User', userSchema);

@@ -27,13 +27,13 @@ export interface Forecast {
   windWavePeriod: number;
 }
 
-export interface IForecast {
+export interface ForecastType {
   time: string;
 
   data: Forecast[];
 }
 
-export interface ITide {
+export interface TideType {
   time: string;
 
   type: string;

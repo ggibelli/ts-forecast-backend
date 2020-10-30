@@ -4,7 +4,8 @@ import mongoose from 'mongoose';
 import http from 'http';
 import { MONGODB_URI, SECRET, PORT } from './utils/config';
 import { loggerInfo, loggerError } from './utils/logger';
-import { typeDefs, resolvers } from './schema/continent-resolver';
+import { typeDef as Continent } from './schema/continent';
+import { resolvers } from './resolvers/continent-resolver';
 //import resolvers from './schema';
 import jwt from 'jsonwebtoken';
 import { User } from './models/user';
@@ -29,7 +30,7 @@ mongoose
 type Req = { req: http.IncomingMessage };
 
 const server = new ApolloServer({
-  typeDefs,
+  typeDefs: [Continent],
   resolvers,
   context: async ({ req }: Req) => {
     const auth = req ? req.headers.authorization : null;

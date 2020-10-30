@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import mongooseUniqueValidator from 'mongoose-unique-validator';
 import { IContinent } from './continent';
 import { ICountry } from './country';
@@ -11,43 +11,40 @@ import { IForecast } from './forecast';
 
 mongoose.set('useCreateIndex', true);
 
-export interface ISurfSpot {
-  continent: mongoose.Types.ObjectId | IContinent;
-  country: mongoose.Types.ObjectId | ICountry;
-  region: mongoose.Types.ObjectId | IRegion;
+export interface ISurfSpot extends Document {
+  continent: IContinent['_id'];
+  country: ICountry['_id'];
+  region: IRegion['_id'];
   name: string;
-  forecast: mongoose.Types.ObjectId | IForecast;
-  type: string;
-  direction: string;
-  bottom: string;
-  good_swell_direction: string;
-  good_wind_direction: string;
-  best_tide_position: string;
-  best_tide_movement: string;
-  dangers: string;
+  forecast?: IForecast['_id'];
+  type?: string;
+  direction?: string;
+  bottom?: string;
+  good_swell_direction?: string;
+  good_wind_direction?: string;
+  best_tide_position?: string;
+  best_tide_movement?: string;
+  dangers?: string;
   latitude: string;
   longitude: string;
-  tile_url: string;
+  tile_url?: string;
   isSecret: boolean;
-  user: mongoose.Types.ObjectId | IUser;
+  user?: IUser['_id'];
 }
 
-interface ISurfSpotDoc extends ISurfSpot, mongoose.Document {}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const SurfSpotFields: Record<keyof ISurfSpot, any> = {
+const spotSchema = new Schema({
   continent: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Continent',
     required: true,
   },
   country: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Country',
     required: true,
   },
   region: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Region',
     required: true,
   },
@@ -57,7 +54,7 @@ const SurfSpotFields: Record<keyof ISurfSpot, any> = {
     required: true,
   },
   forecast: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Forecast',
   },
   type: String,
@@ -76,9 +73,7 @@ const SurfSpotFields: Record<keyof ISurfSpot, any> = {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-};
-
-const spotSchema = new mongoose.Schema(SurfSpotFields);
+});
 
 spotSchema.index({ latitude: 1, longitude: 1 }, { unique: true });
 
@@ -92,4 +87,4 @@ spotSchema.set('toJSON', {
 
 spotSchema.plugin(mongooseUniqueValidator);
 
-export const SurfSpot = mongoose.model<ISurfSpotDoc>('SurfSpot', spotSchema);
+export const SurfSpot = mongoose.model<ISurfSpot>('SurfSpot', spotSchema);
