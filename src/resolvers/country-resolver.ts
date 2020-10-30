@@ -1,20 +1,27 @@
-// import { ObjectId } from 'mongodb';
-// import { Resolver, Query, Arg } from 'type-graphql';
-// import { Country, CountryModel } from '../models/country';
-// import { ObjectIdScalar } from '../utils/object-id.scalar';
+import { QueryResolvers, Country } from '../generated/graphql';
+import { Country as CountryModel } from '../models/country';
 
-// @Resolver((_of) => Country)
-// export class CountryResolver {
-//   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-//   @Query((_returns) => Country)
-//   async country(
-//     @Arg('countryId', (_type) => ObjectIdScalar) countryId: ObjectId
-//   ) {
-//     return await CountryModel.findById(countryId);
-//   }
+interface Resolvers {
+  Query: QueryResolvers;
+}
 
-//   @Query((_returns) => [Country])
-//   async countries(): Promise<Country[]> {
-//     return await CountryModel.find({});
-//   }
-// }
+export const resolver: Resolvers = {
+  Query: {
+    countries: async (): Promise<Country[]> => {
+      const countries: Country[] = await CountryModel.find({})
+        .populate({
+          populate: {
+            path: 'regions',
+            select: ['name', 'latitude', 'longitude'],
+            populate: {
+              path: 'surfSpots',
+              select: 'name',
+              match: { isSecret: false },
+            },
+          },
+        })
+        .lean();
+      return countries;
+    },
+  },
+};

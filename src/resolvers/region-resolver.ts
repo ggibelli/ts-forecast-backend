@@ -1,18 +1,23 @@
-// import { ObjectId } from 'mongodb';
-// import { Resolver, Query, Arg } from 'type-graphql';
-// import { Region, RegionModel } from '../models/region';
-// import { ObjectIdScalar } from '../utils/object-id.scalar';
+import { QueryResolvers, Region } from '../generated/graphql';
+import { Region as RegionModel } from '../models/region';
 
-// @Resolver((_of) => Region)
-// export class RegionResolver {
-//   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-//   @Query((_returns) => Region)
-//   async region(@Arg('regionId', (_type) => ObjectIdScalar) regionId: ObjectId) {
-//     return await RegionModel.findById(regionId);
-//   }
+interface Resolvers {
+  Query: QueryResolvers;
+}
 
-//   @Query((_returns) => [Region])
-//   async regions(): Promise<Region[]> {
-//     return await RegionModel.find({});
-//   }
-// }
+export const resolver: Resolvers = {
+  Query: {
+    regions: async (): Promise<Region[]> => {
+      const regions: Region[] = await RegionModel.find({})
+        .populate({
+          populate: {
+            path: 'surfSpots',
+            select: 'name',
+            match: { isSecret: false },
+          },
+        })
+        .lean();
+      return regions;
+    },
+  },
+};

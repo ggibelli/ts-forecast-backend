@@ -8,8 +8,4 @@ export const typeDef = gql`
     latitude: String!
     longitude: String!
   }
-
-  type Query {
-    continents: [Continent!]
-  }
 `;

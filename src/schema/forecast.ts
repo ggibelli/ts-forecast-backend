@@ -42,8 +42,4 @@ export const typeDefs = gql`
     tides: ITide
     tidesLastRequest: Int!
   }
-
-  type Query {
-    forecasts: [Forecast!]
-  }
 `;

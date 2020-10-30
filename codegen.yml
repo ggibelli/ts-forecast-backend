@@ -3,6 +3,9 @@ schema: './src/schema/*.ts'
 documents: null
 generates:
   src/generated/graphql.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-resolvers'
     config:
       useIndexSignature: true
       defaultMapper: Partial<{T}>
@@ -12,9 +15,6 @@ generates:
         Region:'./src/models/region.ts',
         Surfspot:'./src/models/surfspot.ts',
         Forecast:'./src/models/forecast.ts',
-    plugins:
-      - 'typescript'
-      - 'typescript-resolvers'
   ./graphql.schema.json:
     plugins:
       - 'introspection'

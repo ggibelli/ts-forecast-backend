@@ -10,8 +10,4 @@ export const typeDefs = gql`
     latitude: String!
     longitude: String!
   }
-
-  type Query {
-    regions: [Region!]
-  }
 `;

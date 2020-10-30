@@ -1,26 +1,20 @@
-// import { ObjectId } from 'mongodb';
-// import { Resolver, Query, Arg } from 'type-graphql';
-// import { SurfSpot, SurfSpotModel } from '../models/surfspot';
-// import { ObjectIdScalar } from '../utils/object-id.scalar';
+import { QueryResolvers, Surfspot } from '../generated/graphql';
+import { SurfSpot as SurfspotModel } from '../models/surfspot';
 
-// @Resolver((_of) => SurfSpot)
-// export class SurfspotResolver {
-//   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-//   @Query((_returns) => SurfSpot)
-//   async surfspot(
-//     @Arg('surfspotId', (_type) => ObjectIdScalar) surfspotId: ObjectId
-//   ) {
-//     return await SurfSpotModel.findById(surfspotId);
-//   }
+interface Resolvers {
+  Query: QueryResolvers;
+}
 
-//   @Query((_returns) => Number)
-//   async spotsNumber(): Promise<number> {
-//     const surfspotNumber = await SurfSpotModel.countDocuments();
-//     return surfspotNumber;
-//   }
-
-//   @Query((_returns) => [SurfSpot])
-//   async surfspots(): Promise<SurfSpot[]> {
-//     return await SurfSpotModel.find({});
-//   }
-// }
+export const resolver: Resolvers = {
+  Query: {
+    surfspots: async (): Promise<Surfspot[]> => {
+      const surfspots: Surfspot[] = await SurfspotModel.find({})
+        .select('name')
+        .populate('continent', { name: 1 })
+        .populate('country', { name: 1 })
+        .populate('region', { name: 1 })
+        .lean();
+      return surfspots;
+    },
+  },
+};

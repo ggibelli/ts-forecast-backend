@@ -1,11 +1,11 @@
 import { QueryResolvers, Continent } from '../generated/graphql';
-import { ContinentModel } from '../models/continent';
+import { Continent as ContinentModel } from '../models/continent';
 
 interface Resolvers {
   Query: QueryResolvers;
 }
 
-export const resolvers: Resolvers = {
+export const resolver: Resolvers = {
   Query: {
     continents: async (): Promise<Continent[]> => {
       const continents: Continent[] = await ContinentModel.find({})

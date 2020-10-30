@@ -11,8 +11,4 @@ export const typeDefs = gql`
     createdSpots: [Surfspot!]
     starredSpots: [Surfspot!]
   }
-
-  type Query {
-    users: [User!]
-  }
 `;

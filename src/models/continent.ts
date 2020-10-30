@@ -41,7 +41,7 @@ continentSchema.set('toJSON', {
 });
 
 continentSchema.plugin(mongooseUniqueValidator);
-export const ContinentModel = mongoose.model<IContinent>(
+export const Continent = mongoose.model<IContinent>(
   'Continent',
   continentSchema
 );

@@ -1,15 +1,30 @@
 import express from 'express';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer, makeExecutableSchema } from 'apollo-server-express';
 import mongoose from 'mongoose';
 import http from 'http';
 import { MONGODB_URI, SECRET, PORT } from './utils/config';
 import { loggerInfo, loggerError } from './utils/logger';
-import { typeDef as Continent } from './schema/continent';
-import { resolvers } from './resolvers/continent-resolver';
+import { merge } from 'lodash';
+import { resolver as continentResolvers } from './resolvers/continent-resolver';
+import { resolver as countryResolvers } from './resolvers/country-resolver';
+import { resolver as regionResolvers } from './resolvers/region-resolver';
+import { resolver as surfspotResolvers } from './resolvers/surfspot-resolver';
+//import { resolver as forecastResolvers } from './resolvers/forecast-resolver';
+import { resolver as userResolvers } from './resolvers/user-resolver';
+import { resolver as queryResolver } from './resolvers/query-resolver';
 //import resolvers from './schema';
 import jwt from 'jsonwebtoken';
 import { User } from './models/user';
 import { DecodedToken } from './types';
+import { typeDef as Continent } from './schema/continent';
+import { typeDefs as Country } from './schema/country';
+import { typeDefs as Forecast } from './schema/forecast';
+import { typeDefs as Region } from './schema/region';
+import { typeDefs as SurfSpot } from './schema/surfspot';
+import { typeDefs as UserSchema } from './schema/user';
+import { typeDefs as Query } from './schema/query';
+
+import { Resolvers } from './generated/graphql';
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
@@ -29,9 +44,15 @@ mongoose
 
 type Req = { req: http.IncomingMessage };
 
-const server = new ApolloServer({
-  typeDefs: [Continent],
+const resolvers: Resolvers = queryResolver;
+
+const schema = makeExecutableSchema({
+  typeDefs: [Continent, Country, Forecast, Region, SurfSpot, UserSchema, Query],
   resolvers,
+});
+
+const server = new ApolloServer({
+  schema,
   context: async ({ req }: Req) => {
     const auth = req ? req.headers.authorization : null;
     if (auth && auth.toLowerCase().startsWith('bearer ')) {

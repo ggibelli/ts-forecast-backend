@@ -22,8 +22,4 @@ export const typeDefs = gql`
     tile_url: String
     isSecret: Boolean
   }
-
-  type Query {
-    surfspots: [Surfspot!]
-  }
 `;
