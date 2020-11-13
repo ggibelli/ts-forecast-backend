@@ -9,12 +9,13 @@ generates:
     config:
       useIndexSignature: true
       defaultMapper: Partial<{T}>
-      mappers: User:'./src/models/user.ts'
-        Continent:'./src/models/continent.ts',
-        Country:'./src/models/country.ts',
-        Region:'./src/models/region.ts',
-        Surfspot:'./src/models/surfspot.ts',
-        Forecast:'./src/models/forecast.ts',
+      mappers:
+        User: ./src/models/user.ts#IUser
+        Continent: ./src/models/continent.ts#IContinent
+        Country: ./src/models/country.ts#ICountry
+        Region: ./src/models/region.ts#IRegion
+        Surfspot: ./src/models/surfspot.ts#ISurfspot
+        Forecast: ./src/models/forecast.ts#IForecast
   ./graphql.schema.json:
     plugins:
       - 'introspection'

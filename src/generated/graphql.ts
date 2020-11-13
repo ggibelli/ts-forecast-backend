@@ -1,6 +1,13 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { IUser } from './src/models/user.ts';
+import { IContinent } from './src/models/continent.ts';
+import { ICountry } from './src/models/country.ts';
+import { IRegion } from './src/models/region.ts';
+import { ISurfspot } from './src/models/surfspot.ts';
+import { IForecast } from './src/models/forecast.ts';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -17,16 +24,6 @@ export type Continent = {
   countries?: Maybe<Array<Country>>;
   latitude: Scalars['String'];
   longitude: Scalars['String'];
-};
-
-export type Query = {
-  __typename?: 'Query';
-  continents?: Maybe<Array<Continent>>;
-  countries?: Maybe<Array<Country>>;
-  forecasts?: Maybe<Array<Forecast>>;
-  regions?: Maybe<Array<Region>>;
-  surfspots?: Maybe<Array<Surfspot>>;
-  users?: Maybe<Array<User>>;
 };
 
 export type Country = {
@@ -83,13 +80,64 @@ export type Forecast = {
   tidesLastRequest: Scalars['Int'];
 };
 
+export type Query = {
+  __typename?: 'Query';
+  continents: Array<Continent>;
+  continent?: Maybe<Continent>;
+  countries: Array<Country>;
+  country?: Maybe<Country>;
+  regions: Array<Region>;
+  region?: Maybe<Region>;
+  forecasts: Array<Forecast>;
+  forecast?: Maybe<Forecast>;
+  surfspots?: Maybe<Array<Maybe<Surfspot>>>;
+  surfspot?: Maybe<Surfspot>;
+  users: Array<User>;
+  user?: Maybe<User>;
+};
+
+
+export type QueryContinentArgs = {
+  name: Scalars['String'];
+};
+
+
+export type QueryCountryArgs = {
+  name: Scalars['String'];
+};
+
+
+export type QueryRegionArgs = {
+  name: Scalars['String'];
+};
+
+
+export type QueryForecastArgs = {
+  name: Scalars['String'];
+};
+
+
+export type QuerySurfspotsArgs = {
+  country?: Maybe<Scalars['String']>;
+};
+
+
+export type QuerySurfspotArgs = {
+  name: Scalars['String'];
+};
+
+
+export type QueryUserArgs = {
+  _id: Scalars['String'];
+};
+
 export type Region = {
   __typename?: 'Region';
   _id: Scalars['ID'];
   name: Scalars['String'];
   continent: Continent;
   country: Country;
-  surfspots?: Maybe<Array<Surfspot>>;
+  surfSpots?: Maybe<Array<Surfspot>>;
   latitude: Scalars['String'];
   longitude: Scalars['String'];
 };
@@ -121,7 +169,7 @@ export type User = {
   __typename?: 'User';
   _id: Scalars['ID'];
   username: Scalars['String'];
-  email?: Maybe<Array<Country>>;
+  email: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   passwordHash: Scalars['String'];
@@ -208,40 +256,40 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  Continent: ResolverTypeWrapper<Partial<Continent>>;
+  Continent: ResolverTypeWrapper<IContinent>;
   ID: ResolverTypeWrapper<Partial<Scalars['ID']>>;
   String: ResolverTypeWrapper<Partial<Scalars['String']>>;
-  Query: ResolverTypeWrapper<{}>;
-  Country: ResolverTypeWrapper<Partial<Country>>;
+  Country: ResolverTypeWrapper<ICountry>;
   ForecastData: ResolverTypeWrapper<Partial<ForecastData>>;
   Float: ResolverTypeWrapper<Partial<Scalars['Float']>>;
   IForecast: never;
   ITide: never;
-  Forecast: ResolverTypeWrapper<Partial<Forecast>>;
+  Forecast: ResolverTypeWrapper<IForecast>;
   Int: ResolverTypeWrapper<Partial<Scalars['Int']>>;
-  Region: ResolverTypeWrapper<Partial<Region>>;
-  Surfspot: ResolverTypeWrapper<Partial<Surfspot>>;
+  Query: ResolverTypeWrapper<{}>;
+  Region: ResolverTypeWrapper<IRegion>;
+  Surfspot: ResolverTypeWrapper<ISurfspot>;
   Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>;
-  User: ResolverTypeWrapper<Partial<User>>;
+  User: ResolverTypeWrapper<IUser>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  Continent: Partial<Continent>;
+  Continent: IContinent;
   ID: Partial<Scalars['ID']>;
   String: Partial<Scalars['String']>;
-  Query: {};
-  Country: Partial<Country>;
+  Country: ICountry;
   ForecastData: Partial<ForecastData>;
   Float: Partial<Scalars['Float']>;
   IForecast: never;
   ITide: never;
-  Forecast: Partial<Forecast>;
+  Forecast: IForecast;
   Int: Partial<Scalars['Int']>;
-  Region: Partial<Region>;
-  Surfspot: Partial<Surfspot>;
+  Query: {};
+  Region: IRegion;
+  Surfspot: ISurfspot;
   Boolean: Partial<Scalars['Boolean']>;
-  User: Partial<User>;
+  User: IUser;
 }>;
 
 export type ContinentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Continent'] = ResolversParentTypes['Continent']> = ResolversObject<{
@@ -251,15 +299,6 @@ export type ContinentResolvers<ContextType = any, ParentType extends ResolversPa
   latitude?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   longitude?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  continents?: Resolver<Maybe<Array<ResolversTypes['Continent']>>, ParentType, ContextType>;
-  countries?: Resolver<Maybe<Array<ResolversTypes['Country']>>, ParentType, ContextType>;
-  forecasts?: Resolver<Maybe<Array<ResolversTypes['Forecast']>>, ParentType, ContextType>;
-  regions?: Resolver<Maybe<Array<ResolversTypes['Region']>>, ParentType, ContextType>;
-  surfspots?: Resolver<Maybe<Array<ResolversTypes['Surfspot']>>, ParentType, ContextType>;
-  users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
 }>;
 
 export type CountryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Country'] = ResolversParentTypes['Country']> = ResolversObject<{
@@ -318,12 +357,27 @@ export type ForecastResolvers<ContextType = any, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  continents?: Resolver<Array<ResolversTypes['Continent']>, ParentType, ContextType>;
+  continent?: Resolver<Maybe<ResolversTypes['Continent']>, ParentType, ContextType, RequireFields<QueryContinentArgs, 'name'>>;
+  countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<QueryCountryArgs, 'name'>>;
+  regions?: Resolver<Array<ResolversTypes['Region']>, ParentType, ContextType>;
+  region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType, RequireFields<QueryRegionArgs, 'name'>>;
+  forecasts?: Resolver<Array<ResolversTypes['Forecast']>, ParentType, ContextType>;
+  forecast?: Resolver<Maybe<ResolversTypes['Forecast']>, ParentType, ContextType, RequireFields<QueryForecastArgs, 'name'>>;
+  surfspots?: Resolver<Maybe<Array<Maybe<ResolversTypes['Surfspot']>>>, ParentType, ContextType, RequireFields<QuerySurfspotsArgs, never>>;
+  surfspot?: Resolver<Maybe<ResolversTypes['Surfspot']>, ParentType, ContextType, RequireFields<QuerySurfspotArgs, 'name'>>;
+  users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, '_id'>>;
+}>;
+
 export type RegionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Region'] = ResolversParentTypes['Region']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   continent?: Resolver<ResolversTypes['Continent'], ParentType, ContextType>;
   country?: Resolver<ResolversTypes['Country'], ParentType, ContextType>;
-  surfspots?: Resolver<Maybe<Array<ResolversTypes['Surfspot']>>, ParentType, ContextType>;
+  surfSpots?: Resolver<Maybe<Array<ResolversTypes['Surfspot']>>, ParentType, ContextType>;
   latitude?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   longitude?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -355,7 +409,7 @@ export type SurfspotResolvers<ContextType = any, ParentType extends ResolversPar
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  email?: Resolver<Maybe<Array<ResolversTypes['Country']>>, ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   passwordHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -366,12 +420,12 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   Continent?: ContinentResolvers<ContextType>;
-  Query?: QueryResolvers<ContextType>;
   Country?: CountryResolvers<ContextType>;
   ForecastData?: ForecastDataResolvers<ContextType>;
   IForecast?: IForecastResolvers<ContextType>;
   ITide?: ITideResolvers<ContextType>;
   Forecast?: ForecastResolvers<ContextType>;
+  Query?: QueryResolvers<ContextType>;
   Region?: RegionResolvers<ContextType>;
   Surfspot?: SurfspotResolvers<ContextType>;
   User?: UserResolvers<ContextType>;

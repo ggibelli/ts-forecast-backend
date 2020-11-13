@@ -13,6 +13,8 @@ export interface IContinent extends Document {
   latitude: string;
   longitude: string;
 }
+
+
 const continentSchema = new Schema({
   name: {
     type: String,

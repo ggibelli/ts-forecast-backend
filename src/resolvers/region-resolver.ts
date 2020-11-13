@@ -8,16 +8,26 @@ interface Resolvers {
 export const resolver: Resolvers = {
   Query: {
     regions: async (): Promise<Region[]> => {
-      const regions: Region[] = await RegionModel.find({})
+      const regions = await RegionModel.find({})
+        .lean()
         .populate({
-          populate: {
-            path: 'surfSpots',
-            select: 'name',
-            match: { isSecret: false },
-          },
-        })
-        .lean();
+          path: 'surfSpots',
+          select: 'name',
+          match: { isSecret: false },
+        });
       return regions;
+    },
+
+    region: async (_root, { name }): Promise<Region | null> => {
+      const region = await RegionModel.findOne({ name })
+        .lean()
+        .populate({
+          path: 'surfSpots',
+          select: 'name',
+          match: { isSecret: false },
+        });
+      if (!region) return null;
+      return region;
     },
   },
 };

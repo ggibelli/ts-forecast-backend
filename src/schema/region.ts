@@ -6,7 +6,7 @@ export const typeDefs = gql`
     name: String!
     continent: Continent!
     country: Country!
-    surfspots: [Surfspot!]
+    surfSpots: [Surfspot!]
     latitude: String!
     longitude: String!
   }

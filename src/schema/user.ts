@@ -4,7 +4,7 @@ export const typeDefs = gql`
   type User {
     _id: ID!
     username: String!
-    email: [Country!]
+    email: String!
     firstName: String!
     lastName: String!
     passwordHash: String!

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import mongoose, { Schema, Document } from 'mongoose';
 import mongooseUniqueValidator from 'mongoose-unique-validator';
-import { Surfspot } from '../generated/graphql';
+import { ISurfSpot } from './surfspot';
 
 mongoose.set('useCreateIndex', true);
 
@@ -13,8 +13,8 @@ export interface IUser extends Document {
   firstName: string;
   lastName: string;
   passwordHash: string;
-  starredSpots?: Array<Surfspot['_id']>;
-  createdSpots?: Array<Surfspot['_id']>;
+  starredSpots?: Array<ISurfSpot['_id']>;
+  createdSpots?: Array<ISurfSpot['_id']>;
 }
 
 const userSchema = new Schema({

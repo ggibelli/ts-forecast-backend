@@ -9,6 +9,7 @@ export const resolver: Resolvers = {
   Query: {
     users: async (): Promise<User[]> => {
       const users: User[] = await UserModel.find({})
+        .lean()
         .populate({
           path: 'createdSpots',
           select: ['name', 'isSecret', 'latitude', 'longitude'],
@@ -24,9 +25,31 @@ export const resolver: Resolvers = {
             path: 'country continent region',
             select: 'name',
           },
-        })
-        .lean();
+        });
       return users;
+    },
+
+    user: async (_root, { _id }): Promise<User | null> => {
+      const user = await UserModel.findById(_id)
+        .lean()
+        .populate({
+          path: 'createdSpots',
+          select: ['name', 'isSecret', 'latitude', 'longitude'],
+          populate: {
+            path: 'country continent region',
+            select: 'name',
+          },
+        })
+        .populate({
+          path: 'starredSpots',
+          select: 'name',
+          populate: {
+            path: 'country continent region',
+            select: 'name',
+          },
+        });
+      if (!user) return null;
+      return user;
     },
   },
 };
